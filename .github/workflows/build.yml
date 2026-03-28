@@ -27,10 +27,13 @@ jobs:
 
       - name: Configurar Buildozer
         run: |
+          export PATH=$PATH:~/.local/bin
           if [ ! -f "buildozer.spec" ]; then yes | buildozer init; fi
 
       - name: Fabricar APK
-        run: yes | buildozer -v android debug
+        run: |
+          export PATH=$PATH:~/.local/bin
+          yes | buildozer -v android debug
 
       - name: Guardar el APK
         uses: actions/upload-artifact@v4
