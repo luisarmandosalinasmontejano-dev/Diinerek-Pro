@@ -6,25 +6,30 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Descargar el código
         uses: actions/checkout@v4
 
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
       - name: Preparar la computadora
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libltdl-dev libffi-dev libssl-dev python3-setuptools libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev openjdk-17-jdk
+          sudo apt-get install -y build-essential git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev libltdl-dev
           pip install --upgrade pip
-          pip install buildozer cython virtualenv
+          pip install buildozer cython==0.29.33 virtualenv
 
       - name: Configurar Buildozer
         run: |
           if [ ! -f "buildozer.spec" ]; then buildozer init; fi
 
       - name: Fabricar APK
-        run: buildozer -v android debug
+        run: yes | buildozer -v android debug
 
       - name: Guardar el APK
         uses: actions/upload-artifact@v4
