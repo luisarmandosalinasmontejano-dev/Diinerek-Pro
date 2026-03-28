@@ -12,6 +12,12 @@ jobs:
       - name: Descargar el código
         uses: actions/checkout@v4
 
+      - name: Configurar Java exacto
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
@@ -19,21 +25,18 @@ jobs:
 
       - name: Preparar la computadora
         run: |
-          sudo rm -f /etc/apt/apt.conf.d/50appstream
           sudo apt-get update || true
-          sudo apt-get install -y build-essential git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev libltdl-dev
+          sudo apt-get install -y build-essential git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
           pip install --upgrade pip
           pip install buildozer cython==0.29.33 virtualenv
 
-      - name: Configurar Buildozer
+      - name: Firmar permisos y configurar
         run: |
-          export PATH=$PATH:~/.local/bin
           if [ ! -f "buildozer.spec" ]; then yes | buildozer init; fi
+          sed -i 's/.*android.accept_sdk_license.*/android.accept_sdk_license = True/' buildozer.spec
 
       - name: Fabricar APK
-        run: |
-          export PATH=$PATH:~/.local/bin
-          yes | buildozer -v android debug
+        run: buildozer -v android debug
 
       - name: Guardar el APK
         uses: actions/upload-artifact@v4
