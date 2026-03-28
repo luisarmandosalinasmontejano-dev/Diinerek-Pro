@@ -1,0 +1,26 @@
+name: Crear APK
+
+on:
+  push:
+    branches: [ main, master, Principal ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v2
+
+      - name: Fabricar con Buildozer
+        uses: ArtemSbulba/buildozer-action@v1
+        id: buildozer
+        with:
+          command: buildozer android debug
+          buildozer_version: master
+
+      - name: Guardar el APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: MiApp_Android
+          path: ${{ steps.buildozer.outputs.filename }}
